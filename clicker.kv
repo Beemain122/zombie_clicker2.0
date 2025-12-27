@@ -1,0 +1,192 @@
+#:import from_hex kivy.utils.get_color_from_hex
+#:import colormap kivy.utils.colormap
+#:import dp kivy.metrics.dp
+
+#:set main_color '#00a100'
+#:set main_color_dark "#09f47c"
+
+<Widget>:
+    font_name: 'assets/Lemon-Regular.ttf'
+
+
+<ButtonMenu@Button>:
+    font_size: "56sp"
+    bold: True
+    background_color: 0,0,0,0
+    size_hint: None,None
+    pos_hint: {"center_x": 0.5}
+    width: self.texture_size[0] + dp(40)
+
+    canvas.before:
+        Color:
+            rgba: colormap['darkgreen']
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [self.font_size]
+        Color:
+            rgba: from_hex(main_color) if self.state=='normal' else from_hex(main_color_dark)
+        RoundedRectangle:
+            size: self.size[0]-dp(6), self.size[1]-dp(6)
+            pos: self.pos[0]+dp(3), self.pos[1]+dp(3)
+            radius: [self.font_size]
+
+
+<ButtonIcon@ButtonMenu>:
+    font_name: 'assets/typicons.ttf'
+
+
+<RotatedImage>:
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: self.angle
+            axis: 0,0,1
+            origin: self.center
+    canvas.after:
+        PopMatrix
+
+
+<Menu>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: "30dp"
+        spacing: "20dp"
+
+        canvas:
+            Rectangle:
+                source: 'assets/images/back_menu.png'
+                size: self.size
+                pos: self.pos
+
+        Image:
+            source: "assets/images/title.png"
+            size_hint_y: 0.5
+
+        ButtonMenu:
+            text: " PLAY "
+            on_press: root.go_game()
+
+        ButtonMenu:
+            text: " SETTINGS "
+            on_press: root.go_settings()
+
+        ButtonMenu:
+            text: " EXIT "
+            on_press: root.exit_app()
+
+
+<Game>:
+    BoxLayout:
+        orientation: "vertical"
+
+        canvas:
+            Rectangle:
+                source: 'assets/images/back_game.png'
+                size: self.size
+                pos: self.pos
+
+        FloatLayout:
+            Fish:
+                id: fish
+                size_hint: None,None
+                size: dp(300),dp(300)
+                center: root.center
+
+        ButtonIcon:
+            text: "\uE121"
+            size_hint_y: 0.12
+            on_press: root.go_home()
+
+
+<Shop>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: "20dp"
+        spacing: "20dp"
+
+        Label:
+            text: "SHOP"
+            font_size: "40sp"
+
+        Label:
+            text: "Coins: " + str(app.coins)
+            font_size: "24sp"
+
+        GridLayout:
+            cols: 3
+            spacing: dp(20)
+
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    source: app.WEAPONS[0]["img"]
+                ButtonMenu:
+                    text: "0"
+                    on_press: root.buy(0)
+
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    source: app.WEAPONS[1]["img"]
+                ButtonMenu:
+                    text: "40"
+                    on_press: root.buy(1)
+
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    source: app.WEAPONS[2]["img"]
+                ButtonMenu:
+                    text: "70"
+                    on_press: root.buy(2)
+
+
+<Settings>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: "30dp"
+        spacing: "20dp"
+
+        canvas.before:
+            Color:
+                rgba: 0.05, 0.08, 0.12, 1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+        Label:
+            text: "SETTINGS"
+            font_size: "36sp"
+            bold: True
+            size_hint_y: None
+            height: dp(60)
+
+        Label:
+            text: "Master Volume"
+            font_size: "20sp"
+            size_hint_y: None
+            height: dp(40)
+
+        Slider:
+            id: volume_slider
+            min: 0
+            max: 100
+            value: int(app.master_volume*100) if hasattr(app,'master_volume') else 50
+            on_touch_up: root.apply_volume(str(int(self.value)))
+            size_hint_y: None
+            height: dp(40)
+
+        ButtonMenu:
+            text: "MUSIC ON / OFF"
+            size_hint_y: None
+            height: dp(60)
+            on_press: root.toggle_music()
+
+        Widget:
+
+        ButtonMenu:
+            text: "BACK"
+            size_hint_y: None
+            height: dp(60)
+            on_press: root.go_menu()
